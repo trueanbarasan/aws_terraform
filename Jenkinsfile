@@ -21,30 +21,40 @@ pipeline {
 
         stage('plan') {
             steps {
-                sh 'cd terraform; terraform init'
-                sh 'cd terraform; terraform plan -out tfplan'
-                sh 'cd terraform; terraform show -no-color tfplan > tfplan.txt'
+                dir ('terraform') {
+                    sh 'terraform init'
+                    sh 'terraform plan -out tfplan'
+                    sh 'terraform show -no-color tfplan > tfplan.txt'
+                }
             }
         }
 
         stage('Approval') {
             steps {
-                script {
-                    if (params.action == 'apply') {
-                        if (!params.autoApprove) {
-                            def plan = readFile 'terraform/tfplan.txt'
-                            input message: "Do you want to proceed to apply?",
-                            parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
-                        }
+                dir ('terraform') {
+                    script {
+                        if (params.action == 'apply') {
+                            if (!params.autoApprove) {
+                                def plan = readFile 'tfplan.txt'
+                                input message: "Do you want to proceed to apply?",
+                                parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
+                            }
 
-                        sh 'cd terraform; terraform ${action} -input=false tfplan'
-                    } else if (params.action == 'destroy') {
-                        sh 'cd terraform; terraform ${action} --auto-approve'
-                    } else {
-                        error "Invalid action selected"
+                            sh 'terraform ${action} -input=false tfplan'
+                        } else if (params.action == 'destroy') {
+                            sh 'cd terraform; terraform ${action} --auto-approve'
+                        } else {
+                            error "Invalid action selected"
+                        }
                     }
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
         }
     }
 }
