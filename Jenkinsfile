@@ -9,7 +9,7 @@ pipeline {
     }
 
     agent any
-      stages {
+    stages {
         stage('checkout') {
             steps {
                 script {
@@ -50,7 +50,7 @@ pipeline {
                 sh 'pwd; cd terraform/; terraform apply -input=false tfplan'
             }
         }
-      }
+    }
 }
 
 
