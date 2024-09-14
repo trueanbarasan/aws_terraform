@@ -21,9 +21,9 @@ pipeline {
 
         stage('plan') {
             steps {
-                sh 'terraform init'
-                sh 'terraform plan -out tfplan'
-                sh 'terraform show -no-color tfplan > tfplan.txt'
+                sh 'cd terraform; terraform init'
+                sh 'cd terraform; terraform plan -out tfplan'
+                sh 'cd terraform; terraform show -no-color tfplan > tfplan.txt'
             }
         }
 
@@ -32,14 +32,14 @@ pipeline {
                 script {
                     if (params.action == 'apply') {
                         if (!params.autoApprove) {
-                            def plan = readFile 'tfplan.txt'
+                            def plan = readFile 'terraform/tfplan.txt'
                             input message: "Do you want to proceed to apply?",
                             parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
                         }
 
-                        sh 'terraform ${action} -input=false tfplan'
+                        sh 'cd terraform; terraform ${action} -input=false tfplan'
                     } else if (params.action == 'destroy') {
-                        sh 'terraform ${action} --auto-approve'
+                        sh 'cd terraform; terraform ${action} --auto-approve'
                     } else {
                         error "Invalid action selected"
                     }
