@@ -30,7 +30,7 @@ pipeline {
         stage('Approval') {
             steps {
                 script {
-                    if (params.action = 'apply') {
+                    if (params.action == 'apply') {
                         if (!params.autoApprove) {
                             def plan = readFile 'tfplan.txt'
                             input message: "Do you want to proceed to apply?",
@@ -38,7 +38,7 @@ pipeline {
                         }
 
                         sh 'terraform ${action} -input=false tfplan'
-                    } else if (params.action = 'destroy') {
+                    } else if (params.action == 'destroy') {
                         sh 'terraform ${action} --auto-approve'
                     } else {
                         error "Invalid action selected"
