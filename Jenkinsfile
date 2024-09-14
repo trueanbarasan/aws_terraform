@@ -15,8 +15,7 @@ pipeline {
                 script {
                     dir("terraform")
                     {
-                        // git "https://github.com/trueanbarasan/aws_terraform.git"
-                        echo 'Terraform init in progress'
+                        git branch: 'main', url:"https://github.com/trueanbarasan/aws_terraform.git"
                     }
                 }
             }
