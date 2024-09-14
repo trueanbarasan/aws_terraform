@@ -14,9 +14,9 @@ pipeline {
             steps {
                 script {
                     dir("terraform")
-                    // {
-                    //     git "https://github.com/trueanbarasan/aws_terraform.git"
-                    // }
+                    {
+                        git "https://github.com/trueanbarasan/aws_terraform.git"
+                    }
                 }
             }
         }
